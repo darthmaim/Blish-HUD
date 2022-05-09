@@ -8,6 +8,7 @@ using Gw2Sharp.WebApi.V2.Models;
 using System.Threading.Tasks;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.GameServices;
 using Blish_HUD.Gw2WebApi;
 using Blish_HUD.Gw2WebApi.UI.Views;
 using Blish_HUD.Settings;
@@ -61,6 +62,12 @@ namespace Blish_HUD {
 
         private SettingCollection _apiSettings;
         private SettingCollection _apiKeyRepository;
+
+        public Gw2AuthIntegration Gw2Auth { get; }
+
+        public Gw2WebApiService() {
+            SetServiceModules(this.Gw2Auth = new Gw2AuthIntegration(this));
+        }
 
         protected override void Initialize() {
             _apiSettings = Settings.RegisterRootSettingCollection(GW2WEBAPI_SETTINGS);
