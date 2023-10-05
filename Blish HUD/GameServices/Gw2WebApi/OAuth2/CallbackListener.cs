@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Blish_HUD.Gw2WebApi.Gw2Auth {
+namespace Blish_HUD.GameServices.Gw2WebApi.OAuth2 {
     /// <summary>
     /// Encapsulates an HttpListener for handling start/stop listening with a given callback function.
     /// </summary>
@@ -15,7 +15,7 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth {
         /// <param name="httpAddresses">Http addresses to listen on.</param>
         public CallbackListener(params string[] httpAddresses) {
             _listener = new HttpListener();
-            this.AddPrefixes(httpAddresses);
+            AddPrefixes(httpAddresses);
         }
 
         public void AddPrefixes(string[] httpAddresses) {

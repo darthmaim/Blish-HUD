@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace Blish_HUD.Gw2WebApi.Gw2Auth.Models {
+namespace Blish_HUD.GameServices.Gw2WebApi.OAuth2.Gw2Auth.Models {
     internal class AuthResponseModel {
         /// <summary>
         /// A short-lived one time code which can be used to retrieve the initial Refresh- and Access-Token.
@@ -36,9 +36,9 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth.Models {
 
         public static AuthResponseModel FromQuery(NameValueCollection queryString) {
             return new AuthResponseModel {
-                Code             = queryString["code"],
-                State            = queryString["state"],
-                Error            = queryString["error"],
+                Code = queryString["code"],
+                State = queryString["state"],
+                Error = queryString["error"],
                 ErrorDescription = queryString["error_description"]
             };
         }

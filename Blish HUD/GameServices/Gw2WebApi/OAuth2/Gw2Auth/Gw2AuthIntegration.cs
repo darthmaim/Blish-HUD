@@ -1,5 +1,4 @@
 ﻿using Blish_HUD.GameServices;
-using Blish_HUD.Gw2WebApi.Gw2Auth.Models;
 using Flurl;
 using Flurl.Http;
 using Gw2Sharp.WebApi.V2.Models;
@@ -10,8 +9,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Gw2Sharp.WebApi;
 using Newtonsoft.Json;
+using Blish_HUD.GameServices.Gw2WebApi.OAuth2;
+using Blish_HUD.GameServices.Gw2WebApi.OAuth2.Gw2Auth.Models;
 
-namespace Blish_HUD.Gw2WebApi.Gw2Auth {
+namespace Blish_HUD.GameServices.Gw2WebApi.OAuth2.Gw2Auth {
     public class Gw2AuthIntegration : ServiceModule<Gw2WebApiService> {
 
         private static readonly Logger Logger = Logger.GetLogger<Gw2AuthIntegration>();
@@ -19,14 +20,14 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth {
         public event EventHandler<EventArgs> Login;
 
         private string _gw2AuthBaseAddress = "https://gw2auth.com/oauth2";
-        private string _gw2AuthAuthorize   = "/authorize";
-        private string _gw2AuthToken       = "/token";
-        private string _gw2AuthJwks        = "/jwks";
-        private string _gw2AuthRevoke      = "/revoke";
-        private string _gw2AuthIntrospect  = "/introspect";
+        private string _gw2AuthAuthorize = "/authorize";
+        private string _gw2AuthToken = "/token";
+        private string _gw2AuthJwks = "/jwks";
+        private string _gw2AuthRevoke = "/revoke";
+        private string _gw2AuthIntrospect = "/introspect";
 
-        private Gw2AuthConfig           _config;
-        private CallbackListener        _listener;
+        private Gw2AuthConfig _config;
+        private CallbackListener _listener;
 
         public Gw2AuthIntegration(Gw2WebApiService service) : base(service) {
             _config = new Gw2AuthConfig();
@@ -67,7 +68,7 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth {
                 Exit(context, response.Error, response.ErrorDescription);
                 return;
             }
-            
+
             // Here's where a web-hosted service would normally reignite the previously stored auth process by matching the state parameter.
             // We would then verify that the permissions were not altered before continuing to log in.
             // However, since we are a local application we trust ourselfs that this won't be the case.
@@ -103,14 +104,14 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth {
             }
 
             // We require the "characters" scope.
-            if (userLogin.GetTokenPermissions().Intersect(new []{ TokenPermission.Account, TokenPermission.Characters }).Count() != 2) {
+            if (userLogin.GetTokenPermissions().Intersect(new[] { TokenPermission.Account, TokenPermission.Characters }).Count() != 2) {
                 Exit(context, "invalid_scope", "Missing required permission \"characters\".");
                 return;
             }
 
             Logger.Debug("Processing subtokens from GW2Auth.");
 
-            if (!userLogin.TryGetSubTokens(out var tokens)) { 
+            if (!userLogin.TryGetSubTokens(out var tokens)) {
                 Exit(context, "invalid_request", "No API keys received.");
                 return;
             }
@@ -123,13 +124,13 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth {
                 }
 
                 if (!token.Verified) {
-                    Logger.Warn($"Skipped registration of unverified key \"{token.Name} - {token.Token.Substring(0,10)}*****\".");
+                    Logger.Warn($"Skipped registration of unverified key \"{token.Name} - {token.Token.Substring(0, 10)}*****\".");
                     continue;
                 }
 
                 hasToken = true;
 
-                Logger.Debug($"Registering key \"{token.Name} - {token.Token.Substring(0,10)}*****\".");
+                Logger.Debug($"Registering key \"{token.Name} - {token.Token.Substring(0, 10)}*****\".");
                 await _service.RegisterKey(token.Name, token.Token);
             }
 
@@ -147,7 +148,7 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth {
         private void Exit(HttpListenerContext context, string error = null, string description = null) {
             string redirect = _config.ResultRedirectUri.SetQueryParam($"lang={GetUserLocaleShort()}");
             if (!string.IsNullOrEmpty(error)) {
-                redirect = redirect.SetQueryParams($"error={error}", 
+                redirect = redirect.SetQueryParams($"error={error}",
                                                    $"error_description={description}");
             }
             context.Response.Redirect(redirect);
@@ -159,11 +160,11 @@ namespace Blish_HUD.Gw2WebApi.Gw2Auth {
             return GameService.Overlay.UserLocale.Value switch {
                 Locale.English => "en",
                 Locale.Spanish => "es",
-                Locale.German  => "de",
-                Locale.French  => "fr",
-                Locale.Korean  => "kr",
+                Locale.German => "de",
+                Locale.French => "fr",
+                Locale.Korean => "kr",
                 Locale.Chinese => "zh",
-                _              => "en"
+                _ => "en"
             };
         }
     }

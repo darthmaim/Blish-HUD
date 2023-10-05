@@ -1,4 +1,4 @@
-﻿namespace Blish_HUD.Gw2WebApi.Gw2Auth.Models {
+﻿namespace Blish_HUD.GameServices.Gw2WebApi.OAuth2.Gw2Auth.Models {
     internal class Gw2AuthConfig {
 
         public string Gw2AuthClientId { get; private set; } = "9284be55-229e-4c90-941f-798ac8887512";

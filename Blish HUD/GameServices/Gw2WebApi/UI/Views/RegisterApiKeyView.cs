@@ -6,8 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.GameServices.Gw2Auth.Models;
-using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Gw2WebApi.UI.Presenters;
 using Blish_HUD.Input;
@@ -15,14 +13,7 @@ using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2.Models;
 using Humanizer;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Blish_HUD.GameServices.Gw2WebApi.Gw2Auth.Controls;
+using Blish_HUD.GameServices.Gw2WebApi.OAuth2.Gw2Auth.Controls;
 
 namespace Blish_HUD.Gw2WebApi.UI.Views {
     public class RegisterApiKeyView : View {
@@ -65,7 +56,8 @@ namespace Blish_HUD.Gw2WebApi.UI.Views {
         private (TokenInfo TokenInfo, Account AccountInfo) _loadedDetails;
 
         private TextBox        _apiKeyTextBox;
-        private Gw2AuthButton  _gw2AuthButton;
+        private StandardButton _gw2AuthButton;
+        private StandardButton _gw2meButton;
         private Image          _tokenStatusImg;
         private LoadingSpinner _loadingSpinner;
         private Label          _tokenStatusLbl;
@@ -104,7 +96,7 @@ namespace Blish_HUD.Gw2WebApi.UI.Views {
             _apiKeyTextBox = new TextBox() {
                 Location = new Point(registerLbl.Left, registerLbl.Bottom + 10),
                 Font     = GameService.Content.DefaultFont16,
-                Width    = buildPanel.Width - 93,
+                Width    = buildPanel.Width - 230,
                 Height   = 43,
                 Parent   = buildPanel
             };
@@ -133,16 +125,38 @@ namespace Blish_HUD.Gw2WebApi.UI.Views {
                 Parent   = buildPanel
             };
 
-            _gw2AuthButton = new Gw2AuthButton() {
-                BasicTooltipText = "Login with Gw2Auth",
-                Width            = _apiKeyTextBox.Height,
-                Height = _apiKeyTextBox.Height,
-                Left             = _apiKeyTextBox.Right + 5,
-                Top    = _apiKeyTextBox.Top,
+            var _thirdPartyAuthLbl = new Label() {
+                Text = "3rd Party Authorization",
+                Left = _apiKeyTextBox.Right + 10,
+                Bottom = _apiKeyTextBox.Top - 10,
+                Font = GameService.Content.DefaultFont16,
+                AutoSizeWidth = true,
+                AutoSizeHeight = true,
                 Parent = buildPanel
+
+            };
+
+            _gw2AuthButton = new StandardButton() {
+                Text = "Login with Gw2Auth",
+                BasicTooltipText = "Login with Gw2Auth",
+                Width = 192,
+                Height = 32,
+                Left = _apiKeyTextBox.Right + 10,
+                Top = _apiKeyTextBox.Top,
+                Parent = buildPanel,
             };
 
             _gw2AuthButton.Click += LoginWithGw2AuthBttnClicked;
+
+            _gw2meButton = new StandardButton() {
+                Text = "Login with gw2.me",
+                BasicTooltipText = "Login with gw2.me",
+                Width = 192,
+                Height = 32,
+                Left = _apiKeyTextBox.Right + 10,
+                Top = _gw2AuthButton.Bottom + 10,
+                Parent = buildPanel,
+            };
 
             _loadingSpinner = new LoadingSpinner() {
                 Size     = _tokenStatusImg.Size,
